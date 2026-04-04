@@ -1,0 +1,85 @@
+{% extends "base.html" %}
+{% load tracker_filters %}
+
+{% block title %}Projections — Dividend Tracker{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <h1>Income Projections</h1>
+</div>
+
+<div class="stat-grid" style="margin-bottom:24px">
+  <div class="stat-card">
+    <div class="label">Monthly Income</div>
+    <div class="value">{{ total_monthly|currency }}</div>
+    <div class="sub">projected</div>
+  </div>
+  <div class="stat-card">
+    <div class="label">Annual Income</div>
+    <div class="value">{{ total_annual|currency }}</div>
+    <div class="sub">projected</div>
+  </div>
+</div>
+
+{% if rows %}
+<div class="card" style="margin-bottom:24px">
+  <div class="card-header"><h3>Per-Ticker Breakdown</h3></div>
+  <table>
+    <thead>
+      <tr>
+        <th>Ticker</th>
+        <th class="text-right">Total Shares</th>
+        <th class="text-right">Ann. Div/Share</th>
+        <th class="text-right">Mo. Div/Share</th>
+        <th class="text-right">Monthly Income</th>
+        <th class="text-right">Annual Income</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for row in rows %}
+      <tr>
+        <td><a href="{% url 'ticker_detail' row.ticker.pk %}"><strong>{{ row.ticker.symbol }}</strong></a></td>
+        <td class="text-right">{{ row.total_shares }}</td>
+        <td class="text-right">{{ row.annual_div_per_share|currency6 }}</td>
+        <td class="text-right">{{ row.monthly_div_per_share|currency6 }}</td>
+        <td class="text-right">{{ row.monthly_income|currency }}</td>
+        <td class="text-right">{{ row.annual_income|currency }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+    <tfoot>
+      <tr style="font-weight:600;border-top:2px solid var(--border)">
+        <td colspan="4">Total</td>
+        <td class="text-right">{{ total_monthly|currency }}</td>
+        <td class="text-right">{{ total_annual|currency }}</td>
+      </tr>
+    </tfoot>
+  </table>
+</div>
+
+<div class="card">
+  <div class="card-header"><h3>12-Month Calendar</h3></div>
+  <table>
+    <thead>
+      <tr>
+        <th>Month</th>
+        <th class="text-right">Projected Income</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for month in monthly_calendar %}
+      <tr>
+        <td>{{ month.label }}</td>
+        <td class="text-right">{{ month.income|currency }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+{% else %}
+<div class="card">
+  <div class="empty">No positions with dividends yet. <a href="{% url 'ticker_create' %}">Add a ticker</a> and some positions.</div>
+</div>
+{% endif %}
+{% endblock %}

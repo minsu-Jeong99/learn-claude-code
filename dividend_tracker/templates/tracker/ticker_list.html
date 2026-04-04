@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+{% load tracker_filters %}
+
+{% block title %}Tickers — Dividend Tracker{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <h1>Tickers</h1>
+  <a href="{% url 'ticker_create' %}" class="btn btn-primary">+ Add Ticker</a>
+</div>
+
+<div class="card">
+  {% if tickers %}
+  <table>
+    <thead>
+      <tr>
+        <th>Symbol</th>
+        <th>Name</th>
+        <th>Sector</th>
+        <th class="text-right">Price</th>
+        <th class="text-right">Ann. Div/Share</th>
+        <th class="text-right">Yield</th>
+        <th class="text-right">Positions</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for t in tickers %}
+      <tr>
+        <td><a href="{% url 'ticker_detail' t.pk %}"><strong>{{ t.symbol }}</strong></a></td>
+        <td>{{ t.name }}</td>
+        <td>{% if t.sector %}<span class="badge badge-gray">{{ t.sector }}</span>{% else %}—{% endif %}</td>
+        <td class="text-right">{{ t.current_price|currency }}</td>
+        <td class="text-right">{{ t.annual_dividend_per_share|currency6 }}</td>
+        <td class="text-right">{{ t.current_yield|percentage }}</td>
+        <td class="text-right">{{ t.position_set.count }}</td>
+        <td>
+          <div class="actions">
+            <a href="{% url 'ticker_update' t.pk %}" class="btn btn-secondary btn-sm">Edit</a>
+            <a href="{% url 'ticker_delete' t.pk %}" class="btn btn-danger btn-sm">Del</a>
+          </div>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% else %}
+  <div class="empty">No tickers yet. <a href="{% url 'ticker_create' %}">Add your first ticker</a>.</div>
+  {% endif %}
+</div>
+{% endblock %}

@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+
+{% block title %}Delete Dividend — Dividend Tracker{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <h1>Delete Dividend</h1>
+</div>
+
+<div class="card form-max-width">
+  <div class="card-body">
+    <p style="margin-bottom:20px">Are you sure you want to delete <strong>{{ object }}</strong>?</p>
+    <form method="post">
+      {% csrf_token %}
+      <div style="display:flex;gap:8px">
+        <button type="submit" class="btn btn-danger">Yes, Delete</button>
+        <a href="{% url 'dividend_list' %}" class="btn btn-secondary">Cancel</a>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}

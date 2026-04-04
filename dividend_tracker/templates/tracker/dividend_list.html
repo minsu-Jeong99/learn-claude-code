@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+{% load tracker_filters %}
+
+{% block title %}Dividends — Dividend Tracker{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <h1>Dividends</h1>
+  <a href="{% url 'dividend_create' %}" class="btn btn-primary">+ Add Dividend</a>
+</div>
+
+<div class="card" style="margin-bottom:16px">
+  <div class="card-body" style="padding:12px 20px">
+    <form method="get" style="display:flex;align-items:center;gap:12px">
+      <label style="font-size:13px;font-weight:500;white-space:nowrap">Filter by ticker:</label>
+      <select name="ticker" class="form-control" style="max-width:160px">
+        <option value="">All Tickers</option>
+        {% for t in tickers %}
+        <option value="{{ t.symbol }}" {% if ticker_filter == t.symbol %}selected{% endif %}>{{ t.symbol }}</option>
+        {% endfor %}
+      </select>
+      <button type="submit" class="btn btn-secondary">Filter</button>
+      {% if ticker_filter %}<a href="{% url 'dividend_list' %}" class="btn btn-secondary">Clear</a>{% endif %}
+    </form>
+  </div>
+</div>
+
+<div class="card">
+  {% if dividends %}
+  <table>
+    <thead>
+      <tr>
+        <th>Ticker</th>
+        <th>Ex-Date</th>
+        <th>Pay-Date</th>
+        <th class="text-right">$/Share</th>
+        <th class="text-right">Total Received</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for d in dividends %}
+      <tr>
+        <td><a href="{% url 'ticker_detail' d.ticker.pk %}"><strong>{{ d.ticker.symbol }}</strong></a></td>
+        <td>{{ d.ex_date }}</td>
+        <td>{{ d.pay_date|default:"—" }}</td>
+        <td class="text-right">{{ d.amount_per_share|currency6 }}</td>
+        <td class="text-right">{{ d.total_received|currency }}</td>
+        <td>
+          <div class="actions">
+            <a href="{% url 'dividend_update' d.pk %}" class="btn btn-secondary btn-sm">Edit</a>
+            <a href="{% url 'dividend_delete' d.pk %}" class="btn btn-danger btn-sm">Del</a>
+          </div>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% else %}
+  <div class="empty">No dividend records found. <a href="{% url 'dividend_create' %}">Add one</a>.</div>
+  {% endif %}
+</div>
+{% endblock %}

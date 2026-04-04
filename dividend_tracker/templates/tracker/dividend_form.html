@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+
+{% block title %}{{ title }} — Dividend Tracker{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <h1>{{ title }}</h1>
+  <a href="{% url 'dividend_list' %}" class="btn btn-secondary">Cancel</a>
+</div>
+
+<div class="card form-max-width">
+  <div class="card-body">
+    <form method="post">
+      {% csrf_token %}
+      {% for field in form %}
+      <div class="form-group">
+        <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+        {{ field }}
+        {% if field.errors %}
+        <div style="color:var(--negative);font-size:12px;margin-top:4px">{{ field.errors.as_text }}</div>
+        {% endif %}
+      </div>
+      {% endfor %}
+      <div style="display:flex;gap:8px;margin-top:8px">
+        <button type="submit" class="btn btn-primary">Save</button>
+        <a href="{% url 'dividend_list' %}" class="btn btn-secondary">Cancel</a>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}

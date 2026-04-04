@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+{% load tracker_filters %}
+
+{% block title %}Positions — Dividend Tracker{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <h1>Positions</h1>
+  <a href="{% url 'position_create' %}" class="btn btn-primary">+ Add Position</a>
+</div>
+
+<div class="card">
+  {% if positions %}
+  <table>
+    <thead>
+      <tr>
+        <th>Ticker</th>
+        <th class="text-right">Shares</th>
+        <th class="text-right">Cost Basis/Share</th>
+        <th class="text-right">Total Cost</th>
+        <th class="text-right">Market Value</th>
+        <th class="text-right">Gain/Loss</th>
+        <th class="text-right">YOC</th>
+        <th class="text-right">Monthly Income</th>
+        <th>Date</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for p in positions %}
+      <tr>
+        <td><a href="{% url 'ticker_detail' p.ticker.pk %}"><strong>{{ p.ticker.symbol }}</strong></a></td>
+        <td class="text-right">{{ p.shares }}</td>
+        <td class="text-right">{{ p.cost_basis_per_share|currency }}</td>
+        <td class="text-right">{{ p.total_cost_basis|currency }}</td>
+        <td class="text-right">{{ p.market_value|currency }}</td>
+        <td class="text-right {% if p.gain_loss is not None %}{{ p.gain_loss|gain_loss_class }}{% endif %}">
+          {% if p.gain_loss is not None %}{{ p.gain_loss|currency }}{% else %}—{% endif %}
+        </td>
+        <td class="text-right">{{ p.yield_on_cost|percentage }}</td>
+        <td class="text-right">{{ p.projected_monthly_income|currency }}</td>
+        <td>{{ p.date_acquired }}</td>
+        <td>
+          <div class="actions">
+            <a href="{% url 'position_update' p.pk %}" class="btn btn-secondary btn-sm">Edit</a>
+            <a href="{% url 'position_delete' p.pk %}" class="btn btn-danger btn-sm">Del</a>
+          </div>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% else %}
+  <div class="empty">No positions yet. <a href="{% url 'position_create' %}">Add your first position</a>.</div>
+  {% endif %}
+</div>
+{% endblock %}

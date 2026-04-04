@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+{% load tracker_filters %}
+
+{% block title %}Position: {{ position.ticker.symbol }} — Dividend Tracker{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <h1>Position: <a href="{% url 'ticker_detail' position.ticker.pk %}">{{ position.ticker.symbol }}</a></h1>
+  <div class="actions">
+    <a href="{% url 'position_update' position.pk %}" class="btn btn-secondary">Edit</a>
+    <a href="{% url 'position_delete' position.pk %}" class="btn btn-danger">Delete</a>
+  </div>
+</div>
+
+<div class="stat-grid">
+  <div class="stat-card">
+    <div class="label">Shares</div>
+    <div class="value">{{ position.shares }}</div>
+  </div>
+  <div class="stat-card">
+    <div class="label">Cost Basis/Share</div>
+    <div class="value">{{ position.cost_basis_per_share|currency }}</div>
+  </div>
+  <div class="stat-card">
+    <div class="label">Total Cost Basis</div>
+    <div class="value">{{ position.total_cost_basis|currency }}</div>
+  </div>
+  <div class="stat-card">
+    <div class="label">Market Value</div>
+    <div class="value">{{ position.market_value|currency }}</div>
+  </div>
+  <div class="stat-card">
+    <div class="label">Gain / Loss</div>
+    <div class="value {% if position.gain_loss is not None %}{{ position.gain_loss|gain_loss_class }}{% endif %}">
+      {% if position.gain_loss is not None %}{{ position.gain_loss|currency }}{% else %}—{% endif %}
+    </div>
+  </div>
+  <div class="stat-card">
+    <div class="label">Yield on Cost</div>
+    <div class="value">{{ position.yield_on_cost|percentage }}</div>
+  </div>
+  <div class="stat-card">
+    <div class="label">Monthly Income</div>
+    <div class="value">{{ position.projected_monthly_income|currency }}</div>
+  </div>
+  <div class="stat-card">
+    <div class="label">Annual Income</div>
+    <div class="value">{{ position.projected_annual_income|currency }}</div>
+  </div>
+</div>
+
+{% if position.notes %}
+<div class="card" style="max-width:600px">
+  <div class="card-header"><h3>Notes</h3></div>
+  <div class="card-body">{{ position.notes }}</div>
+</div>
+{% endif %}
+{% endblock %}

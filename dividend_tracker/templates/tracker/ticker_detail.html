@@ -1,0 +1,114 @@
+{% extends "base.html" %}
+{% load tracker_filters %}
+
+{% block title %}{{ ticker.symbol }} — Dividend Tracker{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <h1>{{ ticker.symbol }} <span style="font-weight:400;font-size:16px;color:#718096">{{ ticker.name }}</span></h1>
+  <div class="actions">
+    <a href="{% url 'position_create' %}?ticker={{ ticker.pk }}" class="btn btn-primary">+ Add Position</a>
+    <a href="{% url 'dividend_create' %}?ticker={{ ticker.pk }}" class="btn btn-secondary">+ Add Dividend</a>
+    <a href="{% url 'ticker_update' ticker.pk %}" class="btn btn-secondary">Edit</a>
+    <a href="{% url 'ticker_delete' ticker.pk %}" class="btn btn-danger">Delete</a>
+  </div>
+</div>
+
+<div class="stat-grid" style="margin-bottom:24px">
+  <div class="stat-card">
+    <div class="label">Current Price</div>
+    <div class="value">{{ ticker.current_price|currency }}</div>
+  </div>
+  <div class="stat-card">
+    <div class="label">Ann. Div/Share</div>
+    <div class="value">{{ ticker.annual_dividend_per_share|currency6 }}</div>
+  </div>
+  <div class="stat-card">
+    <div class="label">Current Yield</div>
+    <div class="value">{{ ticker.current_yield|percentage }}</div>
+  </div>
+  {% if ticker.sector %}
+  <div class="stat-card">
+    <div class="label">Sector</div>
+    <div class="value" style="font-size:16px">{{ ticker.sector }}</div>
+  </div>
+  {% endif %}
+</div>
+
+<div class="two-col">
+  <div class="card">
+    <div class="card-header">
+      <h3>Positions</h3>
+      <a href="{% url 'position_create' %}?ticker={{ ticker.pk }}" class="btn btn-secondary btn-sm">+ Add</a>
+    </div>
+    {% if positions %}
+    <table>
+      <thead>
+        <tr>
+          <th>Shares</th>
+          <th class="text-right">Cost Basis</th>
+          <th class="text-right">Market Value</th>
+          <th class="text-right">Gain/Loss</th>
+          <th class="text-right">YOC</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for p in positions %}
+        <tr>
+          <td><a href="{% url 'position_detail' p.pk %}">{{ p.shares }}</a></td>
+          <td class="text-right">{{ p.total_cost_basis|currency }}</td>
+          <td class="text-right">{{ p.market_value|currency }}</td>
+          <td class="text-right {% if p.gain_loss %}{{ p.gain_loss|gain_loss_class }}{% endif %}">
+            {% if p.gain_loss is not None %}{{ p.gain_loss|currency }}{% else %}—{% endif %}
+          </td>
+          <td class="text-right">{{ p.yield_on_cost|percentage }}</td>
+          <td><a href="{% url 'position_update' p.pk %}" class="btn btn-secondary btn-sm">Edit</a></td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    {% else %}
+    <div class="empty">No positions.</div>
+    {% endif %}
+  </div>
+
+  <div class="card">
+    <div class="card-header">
+      <h3>Dividend History</h3>
+      <a href="{% url 'dividend_create' %}?ticker={{ ticker.pk }}" class="btn btn-secondary btn-sm">+ Add</a>
+    </div>
+    {% if dividends %}
+    <table>
+      <thead>
+        <tr>
+          <th>Ex-Date</th>
+          <th>Pay-Date</th>
+          <th class="text-right">$/Share</th>
+          <th class="text-right">Total Received</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for d in dividends %}
+        <tr>
+          <td>{{ d.ex_date }}</td>
+          <td>{{ d.pay_date|default:"—" }}</td>
+          <td class="text-right">{{ d.amount_per_share|currency6 }}</td>
+          <td class="text-right">{{ d.total_received|currency }}</td>
+          <td>
+            <div class="actions">
+              <a href="{% url 'dividend_update' d.pk %}" class="btn btn-secondary btn-sm">Edit</a>
+              <a href="{% url 'dividend_delete' d.pk %}" class="btn btn-danger btn-sm">Del</a>
+            </div>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    {% else %}
+    <div class="empty">No dividend records.</div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}
